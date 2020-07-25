@@ -1,0 +1,196 @@
+---
+title: "Homework: Packages, Scripts, Documents, and Functions"
+author: "Susan Vanderplas"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits = 3)
+```
+
+```{r load-sas-libraries, echo = F, message = F, warning = F}
+saspath <- "/usr/local/SASHome/SASFoundation/9.4/bin/sas_en" # Your SAS path goes here
+sasopts <- "-ls 75"
+knitr::opts_chunk$set(engine.path=list(sas=saspath, saslog=saspath, sashtml=saspath),
+                      engine.opts=list(sas=sasopts, saslog=sasopts, sashtml=sasopts), 
+                      comment=NA)
+library(SASmarkdown)
+```
+
+## Instructions
+This homework has two main problems. In the FizzBuzz section, you should only modify the code chunks. In the Packages/Procedures section, you should modify the text (anything that doesn't have a `###` in front of it) and the code chunks. Feel free to add additional code chunks as necessary.
+
+Make sure you also edit the author name at the top of the document. 
+
+When you are finished with the assignment: 
+
+1. Save the file as 03_Lastname_Firstname.Rmd and compile it
+2. Commit the Rmd file and corresponding html file to your homework git repo
+3. Push the commit to github
+4. Locate the Rmd file on github and click on the SHA link for the file
+5. Paste the url of the resulting page into Canvas to submit your assignment.
+
+Your assignment must compile on a different computer as long as the saspath is set correctly for that machine.
+
+## FizzBuzz Functions
+
+The "FizzBuzz Test" is a famous programming interview question. 
+> Write a program that prints the numbers from 1 to 30. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz”. For numbers which are multiples of both three and five print “FizzBuzz
+
+In the R chunk below, write a function which will solve this problem. Do not change the function name or parameter name. 
+
+Show the results from running your function on the integers 1-20, as well as a sequence of 10 random integers between 0 and 100. (This code is already written for you).
+
+```{r fizzbuzz-solution, echo = T}
+
+fizzbuzz <- function(x) {
+  # FizzBuzz code goes here
+  # This is a crude way to solve this problem, and not the most efficient, 
+  # but it's only using things you know at the moment...
+  # If you're still writing code like this at the end of class, I've failed :)
+  for (i in x) {
+    if (i %% 15 == 0) {        # Handle multiples of 3 and 5 (so 15) first
+      str <- "FizzBuzz"
+    } else if (i %% 5 == 0) { # Then, you know anything that isn't a multiple of
+      str <- "Buzz"           # 15 and is a multiple of 5 isn't divisible by 3
+    } else if (i %% 3 == 0) { # And so if something isn't divisible by 5, you 
+      str <- "Fizz"           # also need to check divisibility by 3
+    } else {
+      str <- as.character(i)  # Then, if none of those conditions hold, print the 
+    }                         # number
+    print(str)
+  }
+}
+
+```
+
+```{r test-fizzbuzz}
+fizzbuzz(1:20)
+fizzbuzz(sample(1:100, 10)) # sample 10 values from 1 to 100
+```
+
+In the sas chunk, write similar code which will solve this problem.
+
+```{sashtml fizzbuzz-sas, error = T}
+proc printto log="saslog.log" new;
+proc iml;
+
+start fizzbuzz(x);
+/* FizzBuzz code goes here */
+  a = '';
+  IF MOD(x, 5)=0 THEN DO;
+      a = cats(a,"Fizz");
+  END;
+  if MOD(x,3)=0 THEN DO;
+      a = cats(a,"Buzz");
+  END;
+  IF a = '' THEN DO;
+      a = cats(a, x);
+  END;
+  RETURN a;
+finish;
+
+x1 = repeat(0, 20); /* initialize x1 */
+fb1 = repeat("        ", 20);
+do i = 1 to 20;
+  x1[i] = i;
+  fb1[i] = fizzbuzz(x1[i]);
+end;
+
+x2 = repeat(0, 10); /* initialize x2 */
+fb2 = repeat("xxxxxxxx", 10); /* initialize fb2 */
+do i = 1 to 10;
+  x2[i] = rand("Integer", 1, 100);
+  fb2[i] = fizzbuzz(x2[i]);
+end;
+
+print x1 fb1, x2 fb2;
+
+quit;
+```
+
+```{r readlog}
+cat(readLines("saslog.log"), sep="\n")
+```
+
+
+```{r cleanuplog}
+# Do not forget to remove the log file when you are done!
+unlink("saslog.log")
+```
+
+
+## Exploring Packages and Modules
+
+### R Package: ishihara
+Find an R package which is interesting to you. Fill in the package name above, and describe or demonstrate some feature of the package here. 
+
+I found a [tweet](https://github.com/njtierney/ishihara) announcing the ishihara R package for R. Ishihara plates are plates used to test for colorblindness, and this package claims to be able to generate them. A couple of caveats -- this is a *very* beta package, so most things don't work as well as they should. Case in point, the package only seems to work with letters that don't have multiple pieces (i, j) or holes (a, b, d). 
+
+```{r, cache = T}
+# devtools::install_github("njtierney/ishihara")
+library(ishihara)
+library(ggplot2)
+
+set.seed(2020-05-10)
+word <- strsplit("Luck", "")[[1]] # Split a word into letters
+plots <- as.list(word) # Make lists to store the data/plots in
+data <- as.list(word)
+# Make a list of 4 different color scales
+scales <- list(scale_fill_discrete(), 
+               scale_fill_brewer(palette = 3), 
+               scale_fill_manual(values = c("red", "green")), 
+               scale_fill_manual(values = c("purple", "yellow")))
+
+# Compute the data
+for(i in 1:length(word)) {
+  data[[i]] <- ishihara_data(word[i])
+} 
+
+# Make the plots
+for(i in 1:length(word)) {
+  plots[[i]] <- gg_ishihara(data[[i]]) + scales[[i]]
+}
+
+library(gridExtra) # Combine plots
+grid.arrange(grobs = plots, ncol = 4)
+```
+
+
+### SAS Procedure: PROC TREE
+Look through the [SAS Procedures Guide](https://go.documentation.sas.com/?docsetId=proc&docsetTarget=part-2.htm&docsetVersion=9.4&locale=en) (or [this](https://go.documentation.sas.com/?docsetId=proc&docsetTarget=p0ptdedyvyouspn1erbeqr0floca.htm&docsetVersion=9.4&locale=en) guide to procedures documented elsewhere) and find a procedure that is interesting to you that we haven't yet discussed (which is most of them). Read the documentation of that procedure and demonstrate its use on a data set that is appropriate. Do not just copy the example code - actually explore what the procedure does. If you need code to get a dataset into SAS, check out [Module 4](https://srvanderplas.github.io/unl-stat850/reading-data.html#delimited-text-files), which has several chunks you can likely steal verbatim. There is also some sample ?data in the sashelp library.
+
+Fill in your code in the chunk below.
+```{sashtml proc-demo, error = T}
+filename pokeloc "./pokemon_ascii.csv";
+options nosource;
+
+proc import datafile = pokeloc out=work.poke
+  DBMS = csv /* comma delimited file */
+  replace;
+  GETNAMES = YES;
+  GUESSINGROWS = 1028 /* use all data for guessing the variable type */
+  ;
+
+
+/* https://communities.sas.com/t5/SAS-Procedures/Deleting-Duplicate-Records-But-Keep-the-one-with-Specific/td-p/427191 */ 
+   
+proc sort data=poke(WHERE=(generation = 1)) out=pokesm;
+  by name generation height_m weight_kg total_points hp attack defense sp_attack sp_defense speed catch_rate;
+run;
+proc sort data=pokesm nodupkey;
+  by name;
+run;
+proc cluster data = pokesm method=average std pseudo noeigen outtree=tree noprint;
+   id name;
+   var height_m weight_kg total_points hp attack defense sp_attack sp_defense speed catch_rate;
+run;
+
+/* set chart size */
+goptions reset=all hsize=8in vsize=24in;
+proc tree horizontal;
+   label _name_ = 'Type';
+run;
+```
+
