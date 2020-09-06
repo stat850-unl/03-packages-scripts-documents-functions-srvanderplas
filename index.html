@@ -438,17 +438,17 @@ fizzbuzz(1:20)</code></pre>
 19 19       19
 20 20     Buzz</code></pre>
 <pre class="r"><code>fizzbuzz(sample(1:100, 10)) # sample 10 values from 1 to 100</code></pre>
-<pre><code>    x      res
-1  93     Fizz
-2  53       53
-3  27     Fizz
-4  33     Fizz
-5  45 FizzBuzz
-6  79       79
-7  62       62
-8  17       17
-9  15 FizzBuzz
-10 35     Buzz</code></pre>
+<pre><code>    x  res
+1  64   64
+2   9 Fizz
+3  31   31
+4  88   88
+5  18 Fizz
+6  69 Fizz
+7  16   16
+8  78 Fizz
+9  50 Buzz
+10 19   19</code></pre>
 <pre class="r"><code># You can also do this slightly differently, by defining fizzbuzz as a function
 # that only works on one number.
 fizzbuzz &lt;- function(x) {
@@ -490,17 +490,17 @@ for (i in 1:20) print(fizzbuzz(i))</code></pre>
 zres &lt;- c() # empty vector
 for (i in z) zres &lt;- c(zres, fizzbuzz(i)) # append result to vector
 data.frame(z, zres) # print out z and zres in columns</code></pre>
-<pre><code>    z     zres
-1  28       28
-2  59       59
-3  21     Fizz
-4  16       16
-5  40     Buzz
-6  34       34
-7  87     Fizz
-8  75 FizzBuzz
-9  66     Fizz
-10 62       62</code></pre>
+<pre><code>    z zres
+1  52   52
+2  97   97
+3  49   49
+4  51 Fizz
+5  42 Fizz
+6  31   31
+7  99 Fizz
+8  10 Buzz
+9  82   82
+10 94   94</code></pre>
 <pre class="r"><code># Invoking the function for a vector will then create a warning 
 # (and the results are wrong)
 fizzbuzz(1:20)</code></pre>
@@ -516,8 +516,9 @@ element will be used</code></pre>
 <pre class="r"><code># This is a simpler way to write the loop -- and more generalizable, because it 
 # returns a data structure that we can use elsewhere more easily
 library(purrr)
-zres &lt;- map_chr(1:20, fizzbuzz) # this runs fizzbuzz for each integer 1:20 and returns a character vector
-data.frame(z = 1:20, zres)</code></pre>
+z &lt;- c(1:20, sample(1:100, 10))
+zres &lt;- map_chr(z, fizzbuzz) # this runs fizzbuzz for each integer 1:20 and returns a character vector
+data.frame(z, zres)</code></pre>
 <pre><code>    z     zres
 1   1        1
 2   2        2
@@ -538,7 +539,17 @@ data.frame(z = 1:20, zres)</code></pre>
 17 17       17
 18 18     Fizz
 19 19       19
-20 20     Buzz</code></pre>
+20 20     Buzz
+21 50     Buzz
+22 44       44
+23 36     Fizz
+24 74       74
+25 62       62
+26 79       79
+27 16       16
+28  9     Fizz
+29 52       52
+30 38       38</code></pre>
 <p>In the sas chunk, write similar code which will solve this problem.</p>
 <pre class="sashtml"><code>/* This function uses the cats method without nested if statements */
 proc iml;
@@ -783,6 +794,62 @@ fb2
 <tbody>
 <tr>
 <td class="r data">
+59
+</td>
+<td class="l data">
+59
+</td>
+</tr>
+<tr>
+<td class="r data">
+37
+</td>
+<td class="l data">
+37
+</td>
+</tr>
+<tr>
+<td class="r data">
+37
+</td>
+<td class="l data">
+37
+</td>
+</tr>
+<tr>
+<td class="r data">
+4
+</td>
+<td class="l data">
+4
+</td>
+</tr>
+<tr>
+<td class="r data">
+13
+</td>
+<td class="l data">
+13
+</td>
+</tr>
+<tr>
+<td class="r data">
+2
+</td>
+<td class="l data">
+2
+</td>
+</tr>
+<tr>
+<td class="r data">
+42
+</td>
+<td class="l data">
+Buzz
+</td>
+</tr>
+<tr>
+<td class="r data">
 81
 </td>
 <td class="l data">
@@ -791,10 +858,10 @@ Buzz
 </tr>
 <tr>
 <td class="r data">
-61
+92
 </td>
 <td class="l data">
-61
+92
 </td>
 </tr>
 <tr>
@@ -803,62 +870,6 @@ Buzz
 </td>
 <td class="l data">
 Fizz
-</td>
-</tr>
-<tr>
-<td class="r data">
-21
-</td>
-<td class="l data">
-Buzz
-</td>
-</tr>
-<tr>
-<td class="r data">
-83
-</td>
-<td class="l data">
-83
-</td>
-</tr>
-<tr>
-<td class="r data">
-13
-</td>
-<td class="l data">
-13
-</td>
-</tr>
-<tr>
-<td class="r data">
-63
-</td>
-<td class="l data">
-Buzz
-</td>
-</tr>
-<tr>
-<td class="r data">
-68
-</td>
-<td class="l data">
-68
-</td>
-</tr>
-<tr>
-<td class="r data">
-57
-</td>
-<td class="l data">
-Buzz
-</td>
-</tr>
-<tr>
-<td class="r data">
-92
-</td>
-<td class="l data">
-92
 </td>
 </tr>
 </tbody>
@@ -997,7 +1008,7 @@ NOTE: 1028 records were read from the infile POKELOC.
 NOTE: The data set WORK.POKE has 1028 observations and 49 variables.
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
-      cpu time            0.00 seconds
+      cpu time            0.01 seconds
       
 
 1028 rows created in WORK.POKE from POKELOC.
@@ -1007,8 +1018,8 @@ NOTE: DATA statement used (Total process time):
 NOTE: WORK.POKE data set was successfully created.
 NOTE: The data set WORK.POKE has 1028 observations and 49 variables.
 NOTE: PROCEDURE IMPORT used (Total process time):
-      real time           0.63 seconds
-      cpu time            0.63 seconds
+      real time           0.62 seconds
+      cpu time            0.61 seconds
       
 
 
@@ -1036,7 +1047,7 @@ WARNING: Ties for minimum distance between clusters have been detected at
 NOTE: The data set WORK.TREE has 375 observations and 27 variables.
 NOTE: PROCEDURE CLUSTER used (Total process time):
       real time           0.00 seconds
-      cpu time            0.01 seconds
+      cpu time            0.00 seconds
       
 
 
@@ -1046,8 +1057,8 @@ NOTE: 170445 bytes written to
       /home/susan/Projects/Class/unl-stat850/Sandbox/03-packages-scripts-do
       cuments-functions-srvanderplas/tree.png.
 NOTE: PROCEDURE TREE used (Total process time):
-      real time           0.22 seconds
-      cpu time            0.21 seconds
+      real time           0.21 seconds
+      cpu time            0.22 seconds
       </code></pre>
 <div class="branch">
 <a name="IDX"></a>
