@@ -49,31 +49,80 @@ fizzbuzz <- function(x) {
   # This is a crude way to solve this problem, and not the most efficient, 
   # but it's only using things you know at the moment...
   # If you're still writing code like this at the end of class, I've failed :)
-  for (i in x) {
-    if (i %% 15 == 0) {        # Handle multiples of 3 and 5 (so 15) first
+
+  fb_res <- rep("", length(x))
+  for (i in 1:length(x)) {
+    xi <- x[i]
+    if (xi %% 15 == 0) {        # Handle multiples of 3 and 5 (so 15) first
       str <- "FizzBuzz"
-    } else if (i %% 5 == 0) { # Then, you know anything that isn't a multiple of
-      str <- "Buzz"           # 15 and is a multiple of 5 isn't divisible by 3
-    } else if (i %% 3 == 0) { # And so if something isn't divisible by 5, you 
-      str <- "Fizz"           # also need to check divisibility by 3
+    } else if (xi %% 5 == 0) { # Then, you know anything that isn't a multiple of
+      str <- "Buzz"            # 15 and is a multiple of 5 isn't divisible by 3
+    } else if (xi %% 3 == 0) { # And so if something isn't divisible by 5, you 
+      str <- "Fizz"            # also need to check divisibility by 3
     } else {
-      str <- as.character(i)  # Then, if none of those conditions hold, print the 
-    }                         # number
-    print(str)
+      str <- as.character(xi)  # Then, if none of those conditions hold, print the 
+    }                          # number
+    fb_res[i] <- str
+    
+    # print(str) # This prints things out one by one
+    # print statements like this are great for debugging, but you
+    # probably want to comment them out when you're done with that stage
   }
+  # Return a data frame with columns x and res
+  return(data.frame(x = x, res = fb_res))
 }
+
+fizzbuzz(1:20)
+
+fizzbuzz(sample(1:100, 10)) # sample 10 values from 1 to 100
 
 ```
 
-```{r test-fizzbuzz}
+
+```{r fizzbuzz-solution2, echo = T}
+# You can also do this slightly differently, by defining fizzbuzz as a function
+# that only works on one number.
+fizzbuzz <- function(x) {
+  if (x %% 15 == 0) {        # Handle multiples of 3 and 5 (so 15) first
+    str <- "FizzBuzz"
+  } else if (x %% 5 == 0) { # Then, you know anything that isn't a multiple of
+    str <- "Buzz"           # 15 and is a multiple of 5 isn't divisible by 3
+  } else if (x %% 3 == 0) { # And so if something isn't divisible by 5, you 
+    str <- "Fizz"           # also need to check divisibility by 3
+  } else {
+    str <- as.character(x)  # Then, if none of those conditions hold, print the 
+  }                         # number
+  return(str)
+}
+
+# The for loop then has to go outside of the function
+for (i in 1:20) print(fizzbuzz(i))
+z <- sample(1:100, 10)
+zres <- c() # empty vector
+for (i in z) zres <- c(zres, fizzbuzz(i)) # append result to vector
+data.frame(z, zres) # print out z and zres in columns
+
+# Invoking the function for a vector will then create a warning 
+# (and the results are wrong)
 fizzbuzz(1:20)
-fizzbuzz(sample(1:100, 10)) # sample 10 values from 1 to 100
+
+```
+
+If you want to expand beyond what we've learned so far, here's another easy way to apply the function to a vector of numbers.
+```{r}
+
+# This is a simpler way to write the loop -- and more generalizable, because it 
+# returns a data structure that we can use elsewhere more easily
+library(purrr)
+z <- c(1:20, sample(1:100, 10))
+zres <- map_chr(z, fizzbuzz) # this runs fizzbuzz for each integer 1:20 and returns a character vector
+data.frame(z, zres)
 ```
 
 In the sas chunk, write similar code which will solve this problem.
 
 ```{sashtml fizzbuzz-sas, error = T}
-proc printto log="saslog.log" new;
+/* This function uses the cats method without nested if statements */
 proc iml;
 
 start fizzbuzz(x);
@@ -110,16 +159,41 @@ print x1 fb1, x2 fb2;
 quit;
 ```
 
-```{r readlog}
-cat(readLines("saslog.log"), sep="\n")
+```{sashtml fizzbuzz-sas2, error = T}
+/* This function uses if/else statements */
+PROC IML;
+start fizzbuzz(x);
+  /* FizzBuzz code goes here */
+  res = '        '; /* start with a string of length 8 (so that there's enough memory) */
+  
+  IF mod(x, 15) = 0 THEN res = "FIZZBUZZ"; 
+  ELSE IF mod(x, 5) = 0 THEN res = "BUZZ";
+  ELSE IF mod(x, 3) = 0 THEN res = "FIZZ";
+  ELSE res = cats('', i); 
+
+  RETURN res;
+finish;
+
+
+x1 = repeat(0, 20); /* initialize x1 */
+fb1 = repeat("        ", 20);
+do i = 1 to 20;
+  x1[i] = i;
+  fb1[i] = fizzbuzz(x1[i]);
+end;
+
+x2 = repeat(0, 10); /* initialize x2 */
+fb2 = repeat("xxxxxxxx", 10); /* initialize fb2 */
+do i = 1 to 10;
+  x2[i] = rand("Integer", 1, 100);
+  fb2[i] = fizzbuzz(x2[i]);
+end;
+
+print x1 fb1, x2 fb2;
+
+QUIT;
+
 ```
-
-
-```{r cleanuplog}
-# Do not forget to remove the log file when you are done!
-unlink("saslog.log")
-```
-
 
 ## Exploring Packages and Modules
 
@@ -129,11 +203,11 @@ Find an R package which is interesting to you. Fill in the package name above, a
 I found a [tweet](https://github.com/njtierney/ishihara) announcing the ishihara R package for R. Ishihara plates are plates used to test for colorblindness, and this package claims to be able to generate them. A couple of caveats -- this is a *very* beta package, so most things don't work as well as they should. Case in point, the package only seems to work with letters that don't have multiple pieces (i, j) or holes (a, b, d). 
 
 ```{r, cache = T}
-# devtools::install_github("njtierney/ishihara")
+if (!"ishihara" %in% installed.packages()) devtools::install_github("njtierney/ishihara")
 library(ishihara)
 library(ggplot2)
 
-set.seed(2020-05-10)
+set.seed(20200510)
 word <- strsplit("Luck", "")[[1]] # Split a word into letters
 plots <- as.list(word) # Make lists to store the data/plots in
 data <- as.list(word)
