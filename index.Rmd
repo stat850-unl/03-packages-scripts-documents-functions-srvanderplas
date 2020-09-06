@@ -121,7 +121,7 @@ data.frame(z, zres)
 
 In the sas chunk, write similar code which will solve this problem.
 
-```{sashtml fizzbuzz-sas, error = T}
+```{r, engine="sashtml", engine.path=saspath, engine.opts=sasopts, error = T}
 /* This function uses the cats method without nested if statements */
 proc iml;
 
@@ -159,7 +159,7 @@ print x1 fb1, x2 fb2;
 quit;
 ```
 
-```{sashtml fizzbuzz-sas2, error = T}
+```{r, engine="sashtml", engine.path=saspath, engine.opts=sasopts, error = T}
 /* This function uses if/else statements */
 PROC IML;
 start fizzbuzz(x);
@@ -169,7 +169,7 @@ start fizzbuzz(x);
   IF mod(x, 15) = 0 THEN res = "FIZZBUZZ"; 
   ELSE IF mod(x, 5) = 0 THEN res = "BUZZ";
   ELSE IF mod(x, 3) = 0 THEN res = "FIZZ";
-  ELSE res = cats('', i); 
+  ELSE res = cats(' ', x); 
 
   RETURN res;
 finish;
@@ -236,7 +236,7 @@ grid.arrange(grobs = plots, ncol = 4)
 Look through the [SAS Procedures Guide](https://go.documentation.sas.com/?docsetId=proc&docsetTarget=part-2.htm&docsetVersion=9.4&locale=en) (or [this](https://go.documentation.sas.com/?docsetId=proc&docsetTarget=p0ptdedyvyouspn1erbeqr0floca.htm&docsetVersion=9.4&locale=en) guide to procedures documented elsewhere) and find a procedure that is interesting to you that we haven't yet discussed (which is most of them). Read the documentation of that procedure and demonstrate its use on a data set that is appropriate. Do not just copy the example code - actually explore what the procedure does. If you need code to get a dataset into SAS, check out [Module 4](https://srvanderplas.github.io/unl-stat850/reading-data.html#delimited-text-files), which has several chunks you can likely steal verbatim. There is also some sample ?data in the sashelp library.
 
 Fill in your code in the chunk below.
-```{sashtml proc-demo, error = T}
+```{r, engine="sashtmllog", engine.path=saspath, engine.opts=sasopts, error = T}
 filename pokeloc "./pokemon_ascii.csv";
 options nosource;
 

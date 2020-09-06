@@ -438,17 +438,17 @@ fizzbuzz(1:20)</code></pre>
 19 19       19
 20 20     Buzz</code></pre>
 <pre class="r"><code>fizzbuzz(sample(1:100, 10)) # sample 10 values from 1 to 100</code></pre>
-<pre><code>    x  res
-1  64   64
-2   9 Fizz
-3  31   31
-4  88   88
-5  18 Fizz
-6  69 Fizz
-7  16   16
-8  78 Fizz
-9  50 Buzz
-10 19   19</code></pre>
+<pre><code>    x      res
+1  35     Buzz
+2  52       52
+3  91       91
+4  43       43
+5  86       86
+6  45 FizzBuzz
+7  28       28
+8  51     Fizz
+9  76       76
+10 31       31</code></pre>
 <pre class="r"><code># You can also do this slightly differently, by defining fizzbuzz as a function
 # that only works on one number.
 fizzbuzz &lt;- function(x) {
@@ -491,16 +491,16 @@ zres &lt;- c() # empty vector
 for (i in z) zres &lt;- c(zres, fizzbuzz(i)) # append result to vector
 data.frame(z, zres) # print out z and zres in columns</code></pre>
 <pre><code>    z zres
-1  52   52
-2  97   97
-3  49   49
-4  51 Fizz
-5  42 Fizz
-6  31   31
-7  99 Fizz
-8  10 Buzz
-9  82   82
-10 94   94</code></pre>
+1  43   43
+2  88   88
+3   1    1
+4  82   82
+5  38   38
+6  84 Fizz
+7  77   77
+8  70 Buzz
+9  92   92
+10 51 Fizz</code></pre>
 <pre class="r"><code># Invoking the function for a vector will then create a warning 
 # (and the results are wrong)
 fizzbuzz(1:20)</code></pre>
@@ -540,16 +540,16 @@ data.frame(z, zres)</code></pre>
 18 18     Fizz
 19 19       19
 20 20     Buzz
-21 50     Buzz
-22 44       44
-23 36     Fizz
-24 74       74
-25 62       62
-26 79       79
-27 16       16
-28  9     Fizz
-29 52       52
-30 38       38</code></pre>
+21 44       44
+22 68       68
+23 69     Fizz
+24 36     Fizz
+25 50     Buzz
+26 35     Buzz
+27 34       34
+28 75 FizzBuzz
+29 26       26
+30 37       37</code></pre>
 <p>In the sas chunk, write similar code which will solve this problem.</p>
 <pre class="sashtml"><code>/* This function uses the cats method without nested if statements */
 proc iml;
@@ -794,55 +794,31 @@ fb2
 <tbody>
 <tr>
 <td class="r data">
-59
+28
 </td>
 <td class="l data">
-59
+28
 </td>
 </tr>
 <tr>
 <td class="r data">
-37
+16
 </td>
 <td class="l data">
-37
+16
 </td>
 </tr>
 <tr>
 <td class="r data">
-37
+30
 </td>
 <td class="l data">
-37
+FizzBuzz
 </td>
 </tr>
 <tr>
 <td class="r data">
-4
-</td>
-<td class="l data">
-4
-</td>
-</tr>
-<tr>
-<td class="r data">
-13
-</td>
-<td class="l data">
-13
-</td>
-</tr>
-<tr>
-<td class="r data">
-2
-</td>
-<td class="l data">
-2
-</td>
-</tr>
-<tr>
-<td class="r data">
-42
+72
 </td>
 <td class="l data">
 Buzz
@@ -850,7 +826,23 @@ Buzz
 </tr>
 <tr>
 <td class="r data">
-81
+56
+</td>
+<td class="l data">
+56
+</td>
+</tr>
+<tr>
+<td class="r data">
+74
+</td>
+<td class="l data">
+74
+</td>
+</tr>
+<tr>
+<td class="r data">
+87
 </td>
 <td class="l data">
 Buzz
@@ -858,18 +850,26 @@ Buzz
 </tr>
 <tr>
 <td class="r data">
-92
+24
 </td>
 <td class="l data">
-92
+Buzz
 </td>
 </tr>
 <tr>
 <td class="r data">
-40
+18
 </td>
 <td class="l data">
-Fizz
+Buzz
+</td>
+</tr>
+<tr>
+<td class="r data">
+94
+</td>
+<td class="l data">
+94
 </td>
 </tr>
 </tbody>
@@ -879,77 +879,332 @@ Fizz
 </div>
 <br>
 </div>
-<pre class="sashtml"><code>6          /* This function uses if/else statements */
-7          PROC IML;
-NOTE: IML Ready
-8          start fizzbuzz(x);
-9            /* FizzBuzz code goes here */
-10           res = '        ';
-10       !                     /* start with a string of length 8 (so that
-10       ! there's enough memory) */
-11         
-12           IF mod(x, 15) = 0 THEN res = &quot;FIZZBUZZ&quot;;
-13           ELSE IF mod(x, 5) = 0 THEN res = &quot;BUZZ&quot;;
-14           ELSE IF mod(x, 3) = 0 THEN res = &quot;FIZZ&quot;;
-15           ELSE res = cats('', i);
-16         
-17           RETURN res;
-18         finish;
-NOTE: Module FIZZBUZZ defined.
-19         
-20         
-21         x1 = repeat(0, 20);
-21       !                     /* initialize x1 */
-22         fb1 = repeat(&quot;        &quot;, 20);
-23         do i = 1 to 20;
-24           x1[i] = i;
-25           fb1[i] = fizzbuzz(x1[i]);
-26         end;
-ERROR: (execution) Module not loaded, operation not available.
+<pre class="sashtml"><code>/* This function uses if/else statements */
+PROC IML;
+start fizzbuzz(x);
+  /* FizzBuzz code goes here */
+  res = '        '; /* start with a string of length 8 (so that there's enough memory) */
+  
+  IF mod(x, 15) = 0 THEN res = &quot;FIZZBUZZ&quot;; 
+  ELSE IF mod(x, 5) = 0 THEN res = &quot;BUZZ&quot;;
+  ELSE IF mod(x, 3) = 0 THEN res = &quot;FIZZ&quot;;
+  ELSE res = cats(' ', x); 
 
- operation : CATS at line 15 column 18
- operands  : *LIT1011, i
-
-*LIT1011      1 row       1 col     (character, size 0)
-
- 
-
-i      0 row       0 col     (type ?, size 0)
+  RETURN res;
+finish;
 
 
- statement : ASSIGN at line 15 column 8
- traceback : module FIZZBUZZ at line 15 column 8
+x1 = repeat(0, 20); /* initialize x1 */
+fb1 = repeat(&quot;        &quot;, 20);
+do i = 1 to 20;
+  x1[i] = i;
+  fb1[i] = fizzbuzz(x1[i]);
+end;
 
-NOTE: Paused in module FIZZBUZZ.
-27         
-28         x2 = repeat(0, 10);
-28       !                     /* initialize x2 */
-29         fb2 = repeat(&quot;xxxxxxxx&quot;, 10);
-29       !                               /* initialize fb2 */
-30         do i = 1 to 10;
-31           x2[i] = rand(&quot;Integer&quot;, 1, 100);
-32           fb2[i] = fizzbuzz(x2[i]);
-33         end;
-ERROR: Module FIZZBUZZ called again before exit from prior call.
+x2 = repeat(0, 10); /* initialize x2 */
+fb2 = repeat(&quot;xxxxxxxx&quot;, 10); /* initialize fb2 */
+do i = 1 to 10;
+  x2[i] = rand(&quot;Integer&quot;, 1, 100);
+  fb2[i] = fizzbuzz(x2[i]);
+end;
 
- statement : ASSIGN at line 32 column 3
-34         
-35         print x1 fb1, x2 fb2;
-ERROR: Matrix x1 has not been set to a value.
+print x1 fb1, x2 fb2;
 
- statement : PRINT at line 35 column 1
-36         
-37         QUIT;
-NOTE: Exiting IML.
-NOTE: The SAS System stopped processing this step because of errors.
-NOTE: PROCEDURE IML used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-38         
-
-
-ERROR: Errors printed on page 1.</code></pre>
+QUIT;
+</code></pre>
+<div class="branch">
+<a name="IDX"></a>
+<div>
+<div align="center">
+<!--BEGINTABLE-->
+<table class="table" cellspacing="0" cellpadding="7" rules="groups" frame="hsides" summary="Procedure IML: x1_fb1">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="r b header" scope="col">
+x1
+</th>
+<th class="l b header" scope="col">
+fb1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="r data">
+1
+</td>
+<td class="l data">
+1
+</td>
+</tr>
+<tr>
+<td class="r data">
+2
+</td>
+<td class="l data">
+2
+</td>
+</tr>
+<tr>
+<td class="r data">
+3
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+4
+</td>
+<td class="l data">
+4
+</td>
+</tr>
+<tr>
+<td class="r data">
+5
+</td>
+<td class="l data">
+BUZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+6
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+7
+</td>
+<td class="l data">
+7
+</td>
+</tr>
+<tr>
+<td class="r data">
+8
+</td>
+<td class="l data">
+8
+</td>
+</tr>
+<tr>
+<td class="r data">
+9
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+10
+</td>
+<td class="l data">
+BUZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+11
+</td>
+<td class="l data">
+11
+</td>
+</tr>
+<tr>
+<td class="r data">
+12
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+13
+</td>
+<td class="l data">
+13
+</td>
+</tr>
+<tr>
+<td class="r data">
+14
+</td>
+<td class="l data">
+14
+</td>
+</tr>
+<tr>
+<td class="r data">
+15
+</td>
+<td class="l data">
+FIZZBUZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+16
+</td>
+<td class="l data">
+16
+</td>
+</tr>
+<tr>
+<td class="r data">
+17
+</td>
+<td class="l data">
+17
+</td>
+</tr>
+<tr>
+<td class="r data">
+18
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+19
+</td>
+<td class="l data">
+19
+</td>
+</tr>
+<tr>
+<td class="r data">
+20
+</td>
+<td class="l data">
+BUZZ
+</td>
+</tr>
+</tbody>
+</table>
+<!--ENDTABLE-->
+</div>
+</div>
+<br> <a name="IDX1"></a>
+<div>
+<div align="center">
+<!--BEGINTABLE-->
+<table class="table" cellspacing="0" cellpadding="7" rules="groups" frame="hsides" summary="Procedure IML: x2_fb2">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="r b header" scope="col">
+x2
+</th>
+<th class="l b header" scope="col">
+fb2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="r data">
+62
+</td>
+<td class="l data">
+62
+</td>
+</tr>
+<tr>
+<td class="r data">
+59
+</td>
+<td class="l data">
+59
+</td>
+</tr>
+<tr>
+<td class="r data">
+57
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+73
+</td>
+<td class="l data">
+73
+</td>
+</tr>
+<tr>
+<td class="r data">
+32
+</td>
+<td class="l data">
+32
+</td>
+</tr>
+<tr>
+<td class="r data">
+77
+</td>
+<td class="l data">
+77
+</td>
+</tr>
+<tr>
+<td class="r data">
+24
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+<tr>
+<td class="r data">
+52
+</td>
+<td class="l data">
+52
+</td>
+</tr>
+<tr>
+<td class="r data">
+46
+</td>
+<td class="l data">
+46
+</td>
+</tr>
+<tr>
+<td class="r data">
+21
+</td>
+<td class="l data">
+FIZZ
+</td>
+</tr>
+</tbody>
+</table>
+<!--ENDTABLE-->
+</div>
+</div>
+<br>
+</div>
 </div>
 <div id="exploring-packages-and-modules" class="section level2">
 <h2>Exploring Packages and Modules</h2>
@@ -989,7 +1244,7 @@ grid.arrange(grobs = plots, ncol = 4)</code></pre>
 <h3>SAS Procedure: PROC TREE</h3>
 <p>Look through the <a href="https://go.documentation.sas.com/?docsetId=proc&amp;docsetTarget=part-2.htm&amp;docsetVersion=9.4&amp;locale=en">SAS Procedures Guide</a> (or <a href="https://go.documentation.sas.com/?docsetId=proc&amp;docsetTarget=p0ptdedyvyouspn1erbeqr0floca.htm&amp;docsetVersion=9.4&amp;locale=en">this</a> guide to procedures documented elsewhere) and find a procedure that is interesting to you that we haven’t yet discussed (which is most of them). Read the documentation of that procedure and demonstrate its use on a data set that is appropriate. Do not just copy the example code - actually explore what the procedure does. If you need code to get a dataset into SAS, check out <a href="https://srvanderplas.github.io/unl-stat850/reading-data.html#delimited-text-files">Module 4</a>, which has several chunks you can likely steal verbatim. There is also some sample ?data in the sashelp library.</p>
 <p>Fill in your code in the chunk below.</p>
-<pre class="sashtml"><code>6          filename pokeloc &quot;./pokemon_ascii.csv&quot;;
+<pre class="sashtmllog"><code>6          filename pokeloc &quot;./pokemon_ascii.csv&quot;;
 7          options nosource;
 
 
@@ -1008,7 +1263,7 @@ NOTE: 1028 records were read from the infile POKELOC.
 NOTE: The data set WORK.POKE has 1028 observations and 49 variables.
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
-      cpu time            0.01 seconds
+      cpu time            0.00 seconds
       
 
 1028 rows created in WORK.POKE from POKELOC.
@@ -1019,7 +1274,7 @@ NOTE: WORK.POKE data set was successfully created.
 NOTE: The data set WORK.POKE has 1028 observations and 49 variables.
 NOTE: PROCEDURE IMPORT used (Total process time):
       real time           0.62 seconds
-      cpu time            0.61 seconds
+      cpu time            0.63 seconds
       
 
 
@@ -1047,7 +1302,7 @@ WARNING: Ties for minimum distance between clusters have been detected at
 NOTE: The data set WORK.TREE has 375 observations and 27 variables.
 NOTE: PROCEDURE CLUSTER used (Total process time):
       real time           0.00 seconds
-      cpu time            0.00 seconds
+      cpu time            0.01 seconds
       
 
 
@@ -1058,7 +1313,7 @@ NOTE: 170445 bytes written to
       cuments-functions-srvanderplas/tree.png.
 NOTE: PROCEDURE TREE used (Total process time):
       real time           0.21 seconds
-      cpu time            0.22 seconds
+      cpu time            0.21 seconds
       </code></pre>
 <div class="branch">
 <a name="IDX"></a>
